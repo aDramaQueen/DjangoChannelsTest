@@ -41,7 +41,7 @@
                         <button id="collapse-button" class="btn btn-link text-bg-dark" data-collapsed="false">
                             <i class="bi bi-arrow-bar-left"></i>
                         </button>
-                        <a class="navbar-brand">{% block navbar-brand %}I3D Test{% endblock %}</a>
+                        <a class="navbar-brand">{% block navbar-brand %}Django Channels Test{% endblock %}</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#change-language" aria-controls="change-language" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
@@ -114,7 +114,6 @@
     </div>{% endblock %}
     {% block js-bootstrap %}<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>{% endblock %}
     {% block navbar-js-script %}<script>
-        // TODO: Weiterer event listener der triggert, wenn der user anfängt das fenster zu vergrößern/verkleinern!
         const originalWidth = document.getElementById("left-navbar").style.width;
         const originalMinWidth = document.getElementById("left-navbar").style.minWidth;
 

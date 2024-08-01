@@ -2,7 +2,6 @@
 # CREATE a ".env" file in root directory of this project. Write following in this file:
 #
 # DEV_WORKING_DIRECTORY=path/to/my/docker-volumes/influx
-# PORT_INFLUX=8086
 # PORT_REDICT=6379
 #
 ##########
