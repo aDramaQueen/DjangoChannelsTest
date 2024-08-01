@@ -357,12 +357,3 @@ poetry.toml
 ##### Docker #####
 ##################
 !docker/.env
-
-#######################
-##### Application #####
-#######################
-spielplatz.py
-
-# Migrations
-**/migrations/*
-!**/migrations/__init__.py

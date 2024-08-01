@@ -1,0 +1,46 @@
+##########
+# CREATE a ".env" file in root directory of this project. Write following in this file:
+#
+# DEV_WORKING_DIRECTORY=path/to/my/docker-volumes/influx
+# PORT_INFLUX=8086
+# PORT_REDICT=6379
+#
+##########
+# USAGE
+#
+# Database is reachable over "localhost" on ports you specify in your ".env" file, e.g.: http://localhost:8086
+#
+##########
+
+services:
+  # NOTE: Redict is NOT hosted on "hub.docker.com". It is hosted on "codeberg.org"
+  # Redict - https://codeberg.org/redict/-/packages/container/redict/versions
+  in-memory-db:
+    image: codeberg.org/redict/redict:7-alpine
+    # restart: unless-stopped
+    networks:
+      development-network:
+        ipv4_address: 172.16.238.69
+        # ipv6_address: 2001:3984:3989::10
+    volumes:
+      - ./resources/redict.conf:/home/redict/redict.conf  # Copy config file in home directory of Redict
+      - type: bind
+        source: ${DEV_WORKING_DIRECTORY:?You need a working directory on your host machine to start this docker composition!}/database/redict
+        target: /data
+    ports:
+      - 127.0.0.1:${PORT_REDICT:?You need a host port that communicates with the in-memory database !!!}:6379
+    # Tell redict, to look for configuration file
+    command: ["redict-server", "/home/redict/redict.conf"]
+
+# @see https://docs.docker.com/compose/compose-file/05-services/#ipv4_address-ipv6_address
+networks:
+  development-network:
+    driver: bridge
+#    driver_opts:
+#      com.docker.network.enable_ipv6: "true"
+    ipam:
+      config:
+        - subnet: 172.16.238.0/24
+          gateway: 172.16.238.1
+#        - subnet: 2001:3984:3989::/64
+#          gateway: 2001:3984:3989::1
