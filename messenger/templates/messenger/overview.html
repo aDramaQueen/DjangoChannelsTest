@@ -1,0 +1,100 @@
+{% extends 'messenger/base.html' %}
+{% load i18n static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-column h-100">
+        <main>
+            <table class="table table-dark table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Read</th>
+                </tr>
+                </thead>
+                <tbody>
+                {# @see messenger.views.MessageMetaData #}
+                {% for message in text_messages %}
+                    <tr>
+                        {# User text messages #}
+                        {% if message.message_type == user_message_type %}
+                        <th scope="row">
+                            <div class="form-check">
+                                <input class="form-check-input userMessageCheckbox" data-id="{{ message.id }}" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault"></label>
+                            </div>
+                        </th>
+                        <td>{{ message.title }}</td>
+                        <td>{{ message.created }}</td>
+                        <td>
+                            <button type="button" class="btn btn-outline-light position-relative" onclick="window.location.href = '{% url "user-message" message.id %}';">
+                                Read
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" {% if message.received %}hidden{% endif %}>
+                                    <span class="visually-hidden">New Message</span>
+                                </span>
+                            </button>
+                        </td>
+                        {# Group text messages #}
+                        {% elif message.message_type == group_message_type %}
+                        <th scope="row">
+                            <div class="form-check">
+                                <input class="form-check-input groupMessageCheckbox" data-id="{{ message.id }}" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault"></label>
+                            </div>
+                        </th>
+                        <td>{{ message.title }}</td>
+                        <td>{{ message.created }}</td>
+                        <td>
+                            <button type="button" class="btn btn-outline-light position-relative" onclick="window.location.href = '{% url "group-message" message.id %}';">
+                                Read
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" {% if message.received %}hidden{% endif %}>
+                                    <span class="visually-hidden">New Message</span>
+                                </span>
+                            </button>
+                        </td>
+                        {# Fallback mechanism #}
+                        {% else %}
+                        <th scope="row">
+                            <div class="form-check">
+                                <input class="form-check-input otherMessageCheckbox" data-type="message" data-id="{{ message.id }}" type="checkbox" value="" id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault"></label>
+                            </div>
+                        </th>
+                        <td>{{ message.title }}</td>
+                        <td>{{ message.created }}</td>
+                        <td>
+                            <button type="button" class="btn btn-outline-light position-relative">
+                                Read
+                                <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" hidden>
+                                    <span class="visually-hidden">New Message</span>
+                                </span>
+                            </button>
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </main>
+        <div class="d-flex flex-column flex-grow-1"></div>
+        <div class="d-flex flex-column justify-content-center">
+            <hr class="text-light">
+            <button type="button" class="btn btn-outline-light mb-2" onclick="markAsRead()">Mark as read</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js-script %}
+    <script>
+    function markAsRead() {
+        const allUserMessageCheckboxes = document.getElementsByClassName("userMessageCheckbox");
+        const allGroupMessageCheckboxes = document.getElementsByClassName("groupMessageCheckbox");
+        const allFallbackMessageCheckboxes = document.getElementsByClassName("otherMessageCheckbox");
+        const userID = {{ request.user.pk }};
+        // TODO: Write mechanism to mark all chosen messages as received for this user
+    }
+    </script>
+{% endblock %}

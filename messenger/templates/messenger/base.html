@@ -1,0 +1,216 @@
+{#{% spaceless %}#}
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Django Channels Test{% endblock %}</title>
+        {% block css_bootstrap %}<link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+        <link rel="stylesheet" href="{% static "icons/bootstrap/font/bootstrap-icons.min.css" %}">{% endblock %}
+    </head>
+    <body class="container-fluid p-0 vh-100">
+    {% block left-navbar %}
+    <div class="d-flex flex-row h-100">
+        <div id="left-navbar" class="bg-dark" style="overflow: hidden; transition: width 0.5s ease, min-width 0.5s ease; width: 200px; min-width: 200px">
+            {# @see https://getbootstrap.com/docs/5.3/components/navbar/ #}
+            <span class="text-center text-light ps-2 fs-2">Menu</span>
+            <nav class="navbar border-bottom border-body h-100 flex-column p-0" data-bs-theme="dark">
+                <ul class="nav navbar-nav w-100 h-100 justify-content-start ps-2">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Analysis</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Meter Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">...</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div id="content-column" class="d-flex flex-column flex-grow-1">
+            <div class="d-flex flex-row">
+                <div id="top-navbar" class="col">
+                    {% block top-navbar %}<div class="navbar sticky-top navbar-expand-md navbar-dark bg-dark">
+                    <div class="container-fluid">
+                        <button id="collapse-button" class="btn btn-link text-bg-dark" data-collapsed="false">
+                            <i class="bi bi-arrow-bar-left"></i>
+                        </button>
+                        <a class="navbar-brand">{% block navbar-brand %}I3D Test{% endblock %}</a>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#change-language" aria-controls="change-language" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse justify-content-end" id="change-language">
+                            <ul class="navbar-nav">
+                                {% if user.is_anonymous %}
+                                <li class="nav-item">
+                                    <button type="button" id="login-button" class="btn btn-outline-light" onclick="location.href = '{% url "admin:index" %}';">{% translate 'Login' %}</button>
+                                </li>
+                                {% else %}
+                                <li class="nav-item pe-2">
+                                    {# @see https://getbootstrap.com/docs/5.3/components/badge/#positioned #}
+                                    <button type="button" class="btn btn btn-outline-light position-relative" onclick="window.location.href = '{% url "message-overview" %}';">
+                                    {# @see https://icons.getbootstrap.com/icons/envelope/ #}
+                                    <i class="bi bi-envelope"></i>
+                                    <span id="notification-counter" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" hidden>
+                                                                0
+                                                            </span>
+                                    </button>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {{ user.username }}
+                                        <img class="rounded-circle" id="nav-profile-img" src="{% static 'image/anonymous.png' %}" alt="User Avatar" style="max-width: 25px; max-height: 25px">
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+                                        <li><a class="dropdown-item" href="#">{% translate 'Account' %}</a></li>
+                                        <li><a class="dropdown-item" href="#">{% translate 'Logout' %}</a></li>
+                                    </ul>
+                                </li>
+                                {% endif %}
+                                <li class="nav-item dropdown dropstart">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="bi bi-globe"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-dark" id="drop-down-menu" aria-labelledby="navbarDropdownMenuLink">
+                                        {% spaceless %}
+                                        {% get_available_languages as LANGUAGES %}
+                                        {% get_language_info_list for LANGUAGES as languages %}
+                                        {% for language in languages %}
+                                        {# @see https://docs.djangoproject.com/en/5.0/topics/i18n/translation/#the-set-language-redirect-view #}
+                                        <form name="change_language_to_{{ language.code }}" action="{% url 'set_language' %}" method="POST">
+                                            {% csrf_token %}
+                                            <input name="next" type="hidden" value="{{ redirect_to }}">
+                                            <input name="language" type="hidden" value="{{ language.code }}">
+                                        </form>
+                                        {% if language.code == LANGUAGE_CODE %}
+                                        <li><a class="dropdown-item active" href="#">
+                                            {{ language.name_local|title }}
+                                        </a></li>
+                                        {% else %}
+                                        <li><a class="dropdown-item" href="#" onclick="change_language_to_{{ language.code }}.submit()">
+                                            {{ language.name_local|title }}
+                                        </a></li>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% endspaceless %}
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>{% endblock %}
+                </div>
+            </div>
+            <div class="row-cols-1 h-100 bg-dark">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>{% endblock %}
+    {% block js-bootstrap %}<script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>{% endblock %}
+    {% block navbar-js-script %}<script>
+        // TODO: Weiterer event listener der triggert, wenn der user anfängt das fenster zu vergrößern/verkleinern!
+        const originalWidth = document.getElementById("left-navbar").style.width;
+        const originalMinWidth = document.getElementById("left-navbar").style.minWidth;
+
+        document.getElementById("collapse-button").addEventListener('click', () => {
+            const button = document.getElementById("collapse-button");
+            const symbol = button.firstElementChild;
+            const navbar = document.getElementById("left-navbar");
+            if(button.dataset.collapsed === 'true') {
+                button.dataset.collapsed = 'false';
+                {# @see https://icons.getbootstrap.com/icons/arrow-bar-left/ #}
+                    {# @see https://icons.getbootstrap.com/icons/arrow-bar-right/ #}
+                        symbol.classList.remove("bi-arrow-bar-right");
+                        symbol.classList.add("bi-arrow-bar-left");
+                        navbar.style.width = originalWidth;
+                        navbar.style.minWidth = originalMinWidth;
+                    } else {
+                    button.dataset.collapsed = 'true';
+                    {# @see https://icons.getbootstrap.com/icons/arrow-bar-left/ #}
+                        {# @see https://icons.getbootstrap.com/icons/arrow-bar-right/ #}
+                            symbol.classList.remove("bi-arrow-bar-left");
+                            symbol.classList.add("bi-arrow-bar-right");
+                            navbar.style.width = '0'
+                            navbar.style.minWidth = '0'
+                        }
+                    });
+    </script>{% endblock %}
+    {% block js-websocket %}<script src="{% static 'messenger/js/message_types.js' %}"></script>
+    <script>
+        const url = `ws://${window.location.host}/ws/notify/`
+        // @see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket
+        const webSocket = new WebSocket(url);
+
+        // Socket opens
+        webSocket.onopen = function (event) {
+            console.log('Socket connected');
+            requestNumberOfNotifications();
+        };
+
+        // Socket closes
+        webSocket.onclose = function (event) {
+            console.log('Socket closed');
+        };
+
+        // Receiving messages
+        webSocket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            switch(data.messageType) {
+                case MessageTypes.UNKNOWN:
+                    throw new Error("Server did not understand last message type sent");
+                case MessageTypes.ERROR:
+                    // @see messenger.dto.ErrorDTO
+                    throw new Error(`Error occurred on server side.\n\tERROR CODE: ${data.errorCode}\n\tERROR MESSAGE: ${data.errorMessage}`);
+                case MessageTypes.NOTIFICATION:
+                    // @see messenger.dto.NotificationDTO
+                    updateCounter(data.unreadMessages);
+                    break;
+                case MessageTypes.USER_TEXT_MESSAGE:
+                    throw new Error("User text message type currently not supported");
+                case MessageTypes.GROUP_TEXT_MESSAGE:
+                    throw new Error("Group text message type currently not supported");
+                case MessageTypes.ALERT:
+                    throw new Error("Alert message type currently not supported");
+                default:
+                    webSocket.send(JSON.stringify({messageType: MessageTypes.UNKNOWN}));
+                    throw new Error(`Unknown message type: ${data.messageType}`);
+            }
+        };
+
+        /**
+         * Updates the counter element for unread messages
+         *
+         * @param stringNumberOfUnreadMessages {String} Current number of unread messages as string
+         */
+        function updateCounter(stringNumberOfUnreadMessages) {
+            // Get notification counter (@see base.html)
+            const counter = document.getElementById('notification-counter');
+            const numberOfNotifications = parseInt(stringNumberOfUnreadMessages);
+            if (numberOfNotifications > 0) {
+                counter.hidden = false;
+                counter.textContent = numberOfNotifications.toString();
+            } else {
+                counter.hidden = true;
+            }
+        }
+
+        /**
+         * Requests current number of notifications
+         *
+         * @see https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications
+         */
+        function requestNumberOfNotifications() {
+            webSocket.send(JSON.stringify({messageType: MessageTypes.NOTIFICATION}));
+        }
+
+    </script>{% endblock %}
+    {% block js-script %}{% endblock %}
+    </body>
+</html>
+{#{% endspaceless %}#}

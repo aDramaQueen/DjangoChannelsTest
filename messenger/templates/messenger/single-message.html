@@ -1,0 +1,8 @@
+{% extends 'messenger/base.html' %}
+{% load i18n static %}
+
+{% block title %}Message{% endblock %}
+
+{% block content %}
+    <p class="text-light">{{ message.content }}</p>
+{% endblock %}

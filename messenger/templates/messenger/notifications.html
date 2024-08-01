@@ -1,0 +1,15 @@
+{% extends 'messenger/base.html' %}
+{% load i18n static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+    <div class="container mt-5 text-light">
+        <h1 class="text-center">Pay attention to the notifications...</h1>
+        {% if user.is_anonymous %}
+        <p class="text-center">You will not see anything here. Create a user and reload this page as logged-in user.</p>
+        {% else %}
+        <p class="text-center">Go to Django Admin page and create a new "User Text Message" or "Group Text Message" while this tab stays open. You will see the number at the envelope will change. This change is triggered from the server side!</p>
+        {% endif %}
+    </div>
+{% endblock %}
