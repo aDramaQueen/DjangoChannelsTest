@@ -1,4 +1,7 @@
 # DjangoChannelsTest
+Test project to show a slow initialization of the Django Channels framework
+
+Linked Problem: [Django Channels with Redis slow intialization](https://forum.djangoproject.com/t/django-channels-with-redis-slow-intialization/33470)
 
 ## Usage
 
